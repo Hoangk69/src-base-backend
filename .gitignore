@@ -1,0 +1,8 @@
+node_modules
+.serverless
+.webpack
+.idea
+.env
+package-lock.json
+.vscode
+*.log

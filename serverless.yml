@@ -1,0 +1,57 @@
+service: new-year
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: dev
+  region: ap-northeast-1
+  memorySize: 512
+  timeout: 500
+  deploymentBucket:
+    name: ${env:DEPLOYMENT_BUCKET}
+  deploymentPrefix: ${env:DEPLOYMENT_BUCKET_PREFIX}
+
+  # iam:
+  #  role:
+  #   statements:
+  #     - Effect: Allow
+  #       Action:
+  #         - s3:ListBucket
+  #         - s3:PutObject
+  #         - s3:GetObject
+  #       Resource:
+  #         - arn:aws:s3:::${env:BUCKET_NAME}/*
+  #     - Effect: Allow
+  #       Action:
+  #         - s3:PutObject
+  #         - s3:GetObject
+  #       Resource:
+  #         - arn:aws:s3:::${env:BUCKET_NAME}/${env:PATH_EXPORT_POKEMON}/*
+
+package:
+  individually: true
+
+functions:
+  api:
+    handler: src/app.handler
+    timeout: 30
+    events:
+      - http:
+          method: ANY
+          path: /new-year/{proxy+}
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+  - serverless-dotenv-plugin
+
+custom:
+  webpack:
+    packager: yarn
+    packagerOptions:
+      noFrozenLockfile: true
+    webpackConfig: webpack.config.js
+    includeModules:
+      forceInclude:
+        - pg
